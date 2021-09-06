@@ -1,0 +1,592 @@
+openapi: 3.0.0
+info:
+  title: Delilah Resto
+  description: API para proyecto Delilah Resto, en el cual se puede manejar ordenes de productos, registrarse para realizar pedidos y los administradores pueden cargar, actualizar y eliminar comidas. 
+  version: "1.0.0"
+servers:
+# Added by API Auto Mocking Plugin
+- description: SwaggerHub API Auto Mocking
+  url: https://virtserver.swaggerhub.com/Johana524/Delilah-Resto-v1/1.0.0
+- url: https://localhost:3000/users
+- url: https://localhost:3000/products
+- url: https://localhost:3000/orders
+tags:
+- name: users
+  description: Endpoint que maneja la informacion relacionada con los usuarios
+- name: products
+  description: Endpoint que maneja la informacion relacionada con los productos.
+- name: orders
+  description: Endpoint que maneja la informacion relacionada con los pedidos.
+  
+paths:
+  /admin/accounts:
+    get:
+      tags: 
+        - users
+      summary: Permite obtener la lista de usuarios registrados
+      security: 
+        - autenticationJWT: []
+      responses:
+        '200':
+          description: Lista de usuarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /register:
+    post:
+      tags:
+        - users
+      summary: Registrar usuarios
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        description: Datos del usuario
+      responses:
+        '200':
+          description: Usuario creado exitosamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /signin:
+    post:
+      tags:
+        - users
+      summary: autenticacion de usuarios y administradores
+      requestBody:
+        content:
+           application/json:
+              schema:
+                properties:
+                  userEmail:
+                    type: string
+                    example: johana@correo.com
+                  userPassword:
+                    type: string
+                    example: 123johana
+        description: credenciales de usuarios
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  token:
+                      type: string
+                      example: eyJhbGciOiJIUzI1NiIsInR5cCI6Ikpkjy98V7
+                  user:
+                    $ref: '#/components/schemas/User'
+          description: Usuario identificado
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /info/{idUser}:
+    get:
+      tags:
+        - users
+      parameters:
+        - name: idUser
+          in: path
+          required: true
+          description: ID del usuario
+          schema:
+            type: string
+      summary: Obtener usuario
+      security: 
+        - autenticationJWT: []
+      responses:
+        '200':
+          description: Usuario con ID especifico
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /{idUser}:
+    put:
+      tags:
+        - users
+      summary: Actualizar usuario
+      parameters:
+        - name: idUser
+          in: path
+          required: true
+          description: ID del usuario
+          schema:
+            type: string
+      description: Actualizar un usuario
+      security:
+        - autenticationJWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        description: Usuario a actualizar
+      responses:
+        '200':
+          description: Usuario actualizado exitosamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /admin/{idUser}:
+    delete:
+      tags:
+        - users
+      summary: Eliminar usuario
+      parameters:
+        - name: idUser
+          in: path
+          required: true
+          description: ID del usuario
+          schema:
+            type: string
+      description: Eliminar usuario
+      security:
+        - autenticationJWT: []
+      responses:
+        '200':
+          description: Usuario eliminado exitosamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  
+  #products
+  /list:
+    get:
+      tags:
+        - products
+      summary: Obtener lista de productos
+      responses:
+        '200':
+          description: Lista de productos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /admin/create:
+    post:
+      tags:
+        - products
+      summary: Agregar producto
+      description: Agregar productos al sistema
+      security: 
+        - autenticationJWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+        description: Producto a agregar
+      responses:
+        '201':
+          description: Producto creado exitosamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /{idProduct}:
+    get:
+      tags:
+        - products
+      parameters:
+        - name: idProduct
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            type: string
+      summary: Obtener producto
+      responses:
+        '200':
+          description: Producto con ID especifico
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /admin/{idProduct}:
+    put:
+      tags:
+        - products
+      summary: Actualizar producto
+      parameters:
+        - name: idProduct
+          in: path
+          required: true
+          description: Producto con ID especifico
+          schema:
+            type: string
+      description: Actualizar producto
+      security:
+        - autenticationJWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+        description: Producto a actualizar
+      responses:
+        '200':
+          description: Producto actualizado exitosamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    delete:
+      tags:
+        - products
+      summary: Eliminar producto
+      parameters:
+        - name: idProduct
+          in: path
+          required: true
+          description: Producto con ID especifico
+          schema:
+            type: string
+      description: Eliminar producto
+      security:
+        - autenticationJWT: []
+      responses:
+        '200':
+          description: Producto eliminado exitosamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  
+  #orders    
+  /:
+    get:
+      tags:
+        - orders
+      summary: Obtener lista de ordenes
+      security:
+        - autenticationJWT: []
+      responses:
+        '200':
+          description: Lista de ordenes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /create:
+    post:
+      tags:
+        - orders
+      summary: Crear una orden
+      description: Agregar orden
+      security: 
+        - autenticationJWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+        description: Orden a agregar
+      responses:
+        '201':
+          description: Orden creada exitosamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /{idOrder}:
+    get:
+      tags:
+        - orders
+      summary: Obtener orden
+      security:
+        - autenticationJWT: []
+      parameters:
+        - name: idOrder
+          in: path
+          required: true
+          description: Orden con ID especifico
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Orden con ID especifico
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags:
+        - orders
+      summary: Actualizar estado de orden
+      parameters:
+        - name: idOrder
+          in: path
+          required: true
+          description: Orden con ID especifico
+          schema:
+            type: string
+      description: Actualizar orden con ID especifico
+      security:
+        - autenticationJWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                order_state:
+                  type: string
+                  example: 'confirmed'
+        description: Estado de la orden a actualizar
+      responses:
+        '200':
+          description: Orden actualizada
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /admin/{idOrder}:
+    delete:
+      tags:
+        - orders
+      summary: Eliminar orden
+      parameters:
+        - name: idOrder
+          in: path
+          required: true
+          description: Orden con ID especifico
+          schema:
+            type: string
+      description: Eliminar orden con ID especifico
+      security:
+        - autenticationJWT: []
+      responses:
+        '200':
+          description: Orden eliminada exitosamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  responses:
+    Unauthorized:
+      description: (Unauthorized) No esta autorizado para realizar esta operacion
+    NotFound:
+      description: (NotFound) No se encontro la informacion
+    BadRequest:
+      description: (BadRequest) Los datos enviados son incorrectos o hay datos obligatorios no enviados
+    ServerError:
+      description: Error en el servidor
+  schemas:
+    Product:
+      type: object
+      required:
+        - product_id
+        - productName
+        - productPrice
+        - productDescription
+      properties:
+        product_id:
+          type: integer
+          format: int64
+          example: 5
+        productName:
+          type: string
+          example: Hummus
+        productPrice:
+          type: number
+          format: decimal
+          example: 450,00
+        productDescription:
+          type: string
+          example: Pure de garbanzos con aceite de oliva, sal y pimenton
+    User:
+      type: object
+      required: 
+        - user_id
+        - userCompleteName
+        - userEmail
+        - userPassword
+        - userPhone
+        - userAddress
+      properties:
+        user_id:
+          type: integer
+          format: int64
+        userCompleteName:
+          type: string
+          example: Johana
+        userEmail:
+          type: string
+          format: mail
+          example: pedro@correo.com
+        userPhone:
+          type: integer
+          example: 3515159350
+        userPassword:
+          type: string
+          example: johana123
+        userAddress:
+          type: string
+          example: Av. Poeta Lugones 230
+        userActive:
+          type: boolean
+          example: false
+        userAdmin:
+          type: boolean
+          example: false
+        
+    Order:
+      type: object
+      required: 
+        - order_id
+        - orderTime
+        - orderStatus
+        - orderDescription
+        - orderProducts
+        - orderPayment
+        - orderTotal
+        - order_user_id
+      properties:
+        order_id: 
+          type: integer
+          format: int64
+          example: 3
+        orderTime:
+          type: string
+          format: data-time
+        orderStatus:
+          type: string
+          example: Enviando
+        orderDescription:
+          type: string
+        orderPayment:
+          type: string
+          example: efectivo
+        orderTotal:
+          type: number
+          format: double
+        order_user_id: 
+          type: integer
+          format: int64
+        orderProducts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductOrder'
+    ProductOrder:
+      type: object
+      required: 
+        - order_id
+        - product_id
+        - quantity
+      properties:
+        order_id: 
+          type: integer
+          format: int64
+          example: 3
+        product_id:
+          $ref: '#/components/schemas/Product'
+        quantity:
+          type: integer
+          format: int64
+  securitySchemes:
+    autenticationJWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
